@@ -1,4 +1,4 @@
-#define SERIAL 1 // set to 1 to show incoming request on serial port
+#define DSERIAL 1 // set to 1 to show incoming request on serial port
 
 /**
  * ethernet configuration

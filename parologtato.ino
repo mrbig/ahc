@@ -14,7 +14,7 @@ byte Ethernet::buffer[500];
  * Setup the hardware in and outputs
  */
 void setup(void) {
-#if SERIAL
+#if DSERIAL
   Serial.begin(57600);
   Serial.println("booting...");
 #endif
@@ -26,7 +26,7 @@ void setup(void) {
   
   ether.staticSetup(myip);
 
-#if SERIAL
+#if DSERIAL
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);  
   ether.printIp("DNS: ", ether.dnsip);  
@@ -42,9 +42,6 @@ void loop(void) {
   /*
   checkOneWire();
   checkDHT11();
-  digitalWrite(Control_Pin, IOState);
-  IOState = !IOState;
-  delay(2000); //just here to slow down the output so it is easier to read
   */
 }
 
