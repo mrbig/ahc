@@ -57,7 +57,7 @@ static void homePage(BufferFiller& buf) {
 static void send404(BufferFiller& buf) {
   buf.emit_p(PSTR(
     "HTTP/1.0 404 Not found\r\n"
-    "Content-Type: text/html"
+    "Content-Type: text/html\r\n"
     "\r\n"
     "<h1>404 Not found</h1>"));
 }
