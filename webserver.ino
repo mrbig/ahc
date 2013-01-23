@@ -30,7 +30,7 @@ static const char htmlFooter[] PROGMEM =
   "</body></html>"
 ;
 
-  
+
 /**
  * Check the ethernet for incoming data
  * Handle if anything is received.
@@ -38,24 +38,55 @@ static const char htmlFooter[] PROGMEM =
  * main loop
  */
 void checkEthernet() {
-  word pos = ether.packetLoop(ether.packetReceive());
+  word plen = ether.packetReceive();
+  word pos;
+  
   // check if valid tcp data is received
-  if (pos) {
-    bfill = ether.tcpOffset();
-    char * data = (char *) Ethernet::buffer + pos;
+  if (plen) {
+    // do basic checks, and handle webserver
+    if ((pos = ether.packetLoop(plen))) {
+      bfill = ether.tcpOffset();
+      char * data = (char *) Ethernet::buffer + pos;
 #if DSERIAL
-    Serial.println(data);
+      Serial.println(data);
 #endif
-    // Check the input and prepare the returned content
-    if (strncmp("GET / HTTP", data, 10) == 0)
-      homePage(bfill);
-    else if (strncmp("GET /?io=", data, 8) == 0)
-      updateIO(bfill, data);
-    else
-      send404(bfill);
-      
-    // send web page data
-    ether.httpServerReply(bfill.position());
+      // Check the input and prepare the returned content
+      if (strncmp("GET / HTTP", data, 10) == 0)
+        homePage(bfill);
+      else if (strncmp("GET /?io=", data, 8) == 0)
+        updateIO(bfill, data);
+      else
+        send404(bfill);
+        
+      // send web page data
+      ether.httpServerReply(bfill.position());
+    }
+    // check the zabbix port
+    else if ((pos = ether.accept(10050, plen))) {
+      Serial.println("got packet on 10050");
+#if DSERIAL
+      char * data = (char *) Ethernet::buffer + pos;
+      Serial.println(data);
+#endif
+      byte i;
+      char header[9];
+      bfill = ether.tcpOffset();
+      bfill.emit_p(PSTR("ZBXD"));
+      for (i=0; i<9; i++) {
+        switch (i) {
+          case 0:
+            header[i] = 0x01; break;
+          case 1:
+            header[i] = 5; break;
+          default:
+            header[i] = 0;
+        }
+      }
+      bfill.emit_raw(header, 9);
+      bfill.emit_p(PSTR("demo1"));
+      ether.httpServerReply(bfill.position());
+    }
+    Serial.println("---------------------\n\n");
   }
 }
 

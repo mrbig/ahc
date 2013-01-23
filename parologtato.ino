@@ -10,6 +10,7 @@ byte IOState;
 // tcp/ip send and receive buffer
 byte Ethernet::buffer[500];
 
+
 /**
  * Setup the hardware in and outputs
  */
