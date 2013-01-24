@@ -2,11 +2,34 @@
  * This file contains the codes of the zabbix agent
  */
 
+// This is the type definition for the callback functions
+typedef void(* zabbix_cb)(BufferFiller &buf, String &cmd);
+
+// These are the valid commands handled by the system
 static const char cmd1[] PROGMEM = "agent.ping";
 static const char cmd2[] PROGMEM = "agent.version";
 
+// mapping of the command strings
 static const char* zabbix_commands[] = {cmd1, cmd2};
+// and the command callbacks
+static zabbix_cb zabbix_callbacks[] = {&agent_ping, &agent_version};
 
+
+/**
+ * Handle the ping request
+ */
+static void agent_ping(BufferFiller &buf, String &cmd) {
+  Serial.println("callback agent.ping");
+  sendZabbixResponse(buf, "1");
+}
+
+/**
+ * Handle version check
+ */
+void agent_version(BufferFiller &buf, String &cmd) {
+  Serial.println("callback agent.Version");
+  sendZabbixResponse(buf, "demo02");
+}
 
 /**
  * Handle incoming requests for the zabbix agent
@@ -37,20 +60,16 @@ static void serviceZabbixRequest(BufferFiller &buf, word pos) {
       check += c;
     }
     check += '\n'; // every command ends with a newline
-    // now check contains the command
+    // now check contains the command name
     
-    Serial.print(check.length(), DEC);
-    Serial.println(check);
+    // Check it agains the current command
     if (cmd == check) {
-      Serial.print("matched command ");
-      Serial.println(i, DEC);
-    } else {
-      Serial.println("no match");
+      zabbix_callbacks[i](buf, cmd);
     }
   }
   
 
-  sendZabbixResponse(buf, "demo02");
+  
 
 }
 
@@ -77,7 +96,7 @@ void sendZabbixResponse(BufferFiller &buf, const char* response) {
         header[i] = 0;
     }
   }
-  Serial.println("response:");
+  Serial.print("response: ");
   Serial.print(len);
   Serial.println(response);
   
