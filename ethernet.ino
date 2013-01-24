@@ -19,11 +19,11 @@ void checkEthernet() {
   if (plen) {
     // do basic checks, and handle webserver
     if ((pos = ether.packetLoop(plen))) {
-      serviceHttpRequest(pos);
+      serviceHttpRequest(bfill, pos);
     }
     // check the zabbix port
     else if ((pos = ether.accept(10050, plen))) {
-      serviceZabbixRequest(pos);
+      serviceZabbixRequest(bfill, pos);
     }
   }
 }

@@ -29,10 +29,11 @@ static const char htmlFooter[] PROGMEM =
 
 /**
  * Service any request on the webserver
+ * @param BufferFiller buf the buffer filler to be used for output
  * @param word pos Position in the ethernet packet
  */
-static void serviceHttpRequest(const word pos) {
-  bfill = ether.tcpOffset();
+static void serviceHttpRequest(BufferFiller& buf, const word pos) {
+  buf = ether.tcpOffset();
   char * data = (char *) Ethernet::buffer + pos;
 
 #if DSERIAL
@@ -41,14 +42,14 @@ static void serviceHttpRequest(const word pos) {
 
   // Check the input and prepare the returned content
   if (strncmp("GET / HTTP", data, 10) == 0)
-    homePage(bfill);
+    homePage(buf);
   else if (strncmp("GET /?io=", data, 8) == 0)
-    updateIO(bfill, data);
+    updateIO(buf, data);
   else
-    send404(bfill);
+    send404(buf);
 
   // send web page data
-  ether.httpServerReply(bfill.position());
+  ether.httpServerReply(buf.position());
 }
 
 /**
