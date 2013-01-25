@@ -5,30 +5,37 @@
 // This is the type definition for the callback functions
 typedef void(* zabbix_cb)(BufferFiller &buf, String &cmd);
 
+// This structure is used to configure the callbacks
+typedef struct {
+  const char * cmd; // Name of the item
+  const zabbix_cb callback; // Callback handler
+} ZabbixConfig;
+
 // These are the valid commands handled by the system
 static const char cmd1[] PROGMEM = "agent.ping";
 static const char cmd2[] PROGMEM = "agent.version";
 
-// mapping of the command strings
-static const char* zabbix_commands[] = {cmd1, cmd2};
-// and the command callbacks
-static zabbix_cb zabbix_callbacks[] = {&agent_ping, &agent_version};
 
+/**
+ * Configuration of the commands and the callbacks
+ */
+static const ZabbixConfig zabbix_config[] = {
+  {cmd1, &agent_ping},
+  {cmd2, &agent_version}
+};
 
 /**
  * Handle the ping request
  */
 static void agent_ping(BufferFiller &buf, String &cmd) {
-  Serial.println("callback agent.ping");
   sendZabbixResponse(buf, "1");
 }
 
 /**
  * Handle version check
  */
-void agent_version(BufferFiller &buf, String &cmd) {
-  Serial.println("callback agent.Version");
-  sendZabbixResponse(buf, "demo02");
+static void agent_version(BufferFiller &buf, String &cmd) {
+  sendZabbixResponse(buf, "ahc 0.1");
 }
 
 /**
@@ -51,11 +58,11 @@ static void serviceZabbixRequest(BufferFiller &buf, word pos) {
   Serial.println(cmd);
 #endif
 
-  // 2: this is the size of a pointer
-  for (i=0; i<(sizeof zabbix_commands)/2; i++) {
+  // Iterate over the configuration array
+  for (i=0; i<(sizeof zabbix_config)/(sizeof (ZabbixConfig)); i++) {
     // read from the eeprom
     check = "";
-    ptr = zabbix_commands[i];
+    ptr = zabbix_config[i].cmd;
     while ((c = pgm_read_byte(ptr++))) {
       check += c;
     }
@@ -64,7 +71,7 @@ static void serviceZabbixRequest(BufferFiller &buf, word pos) {
     
     // Check it agains the current command
     if (cmd == check) {
-      zabbix_callbacks[i](buf, cmd);
+      (zabbix_config[i].callback)(buf, cmd);
     }
   }
   
