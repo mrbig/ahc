@@ -14,27 +14,70 @@ typedef struct {
 // These are the valid commands handled by the system
 static const char cmd1[] PROGMEM = "agent.ping";
 static const char cmd2[] PROGMEM = "agent.version";
-
+static const char cmd3[] PROGMEM = "ahc.iostate";
+static const char cmd4[] PROGMEM = "ahc.temperature";
+static const char cmd5[] PROGMEM = "ahc.humidity";
 
 /**
  * Configuration of the commands and the callbacks
  */
 static const ZabbixConfig zabbix_config[] = {
-  {cmd1, &agent_ping},
-  {cmd2, &agent_version}
+  {cmd1, &zbx_agent_ping},
+  {cmd2, &zbx_agent_version},
+  {cmd3, &zbx_ahc_iostate},
+  {cmd4, &zbx_ahc_temperature},
+  {cmd5, &zbx_ahc_humidity},
 };
 
 /**
  * Handle the ping request
  */
-static void agent_ping(BufferFiller &buf, String &cmd) {
+static void zbx_agent_ping(BufferFiller &buf, String &cmd) {
   sendZabbixResponse(buf, "1");
+}
+
+/**
+ * Return the current io state
+ */
+static void zbx_ahc_iostate(BufferFiller &buf, String &cmd) {
+  char buffer[2];
+  buffer[0] = IOState + '0';
+  buffer[1] = 0;
+  sendZabbixResponse(buf, buffer);
+}
+
+/**
+ * Return the current temperature
+ */
+static void zbx_ahc_temperature(BufferFiller &buf, String &cmd) {
+  char buffer[16];
+  float temp = getTemp();
+  if (temp > -1000) {
+    dtostrf(temp, 4, 2, buffer);
+    sendZabbixResponse(buf, buffer);
+  } else {
+    sendZabbixResponse(buf, "ZBX_ERROR");
+  }
+}
+
+/**
+ * Return the current humidity
+ */
+static void zbx_ahc_humidity(BufferFiller &buf, String &cmd) {
+  char buffer[16];
+  float hum = getHumidity();
+  if (hum > -1000) {
+    dtostrf(hum, 4, 2, buffer);
+    sendZabbixResponse(buf, buffer);
+  } else {
+    sendZabbixResponse(buf, "ZBX_ERROR");
+  }
 }
 
 /**
  * Handle version check
  */
-static void agent_version(BufferFiller &buf, String &cmd) {
+static void zbx_agent_version(BufferFiller &buf, String &cmd) {
   sendZabbixResponse(buf, "ahc 0.1");
 }
 
@@ -72,10 +115,11 @@ static void serviceZabbixRequest(BufferFiller &buf, word pos) {
     // Check it agains the current command
     if (cmd == check) {
       (zabbix_config[i].callback)(buf, cmd);
+      return;
     }
   }
   
-
+  sendZabbixResponse(buf, "ZBX_NOTSUPPORTED");
   
 
 }
@@ -103,9 +147,12 @@ void sendZabbixResponse(BufferFiller &buf, const char* response) {
         header[i] = 0;
     }
   }
-  Serial.print("response: ");
+#if DSERIAL
+  Serial.print("response: (");
   Serial.print(len);
+  Serial.print(")");
   Serial.println(response);
+#endif
   
   buf = ether.tcpOffset();
   buf.emit_p(PSTR("ZBXD"));

@@ -4,14 +4,6 @@
 OneWire ds(DS18S20_Pin);
 
 
-/**
- * Check the onewire bus for DS18S20, and display the celsius
- */
-void checkOneWire() {
-  float temperature = getTemp();
-  Serial.println(temperature);
-
-}
 
 /**
  * Read the temperature from the first DS18S20 on the bus
@@ -29,19 +21,25 @@ float getTemp(){
   }
 
   if ( OneWire::crc8( addr, 7) != addr[7]) {
+#if DSERIAL
     Serial.println("CRC is not valid!");
+#endif
     return -1000;
   }
   
+#if DSERIAL
   Serial.print("Found device: ");
   for (byte i=0; i<8; i++) {
     if (addr[i]<16) Serial.print("0");
     Serial.print(addr[i], HEX);
   }
   Serial.println("");
+#endif
 
   if ( addr[0] != 0x10 && addr[0] != 0x28) {
+#if DSERIAL
     Serial.print("Device is not recognized");
+#endif
     return -1000;
   }
   

@@ -4,10 +4,26 @@
 dht11 DHT11;
 
 /**
- * Contact the DHT11 and display the humidity and temperature read from it
+ * Return the current humidity
+ * @return the humidity or -1000 if there was an error
  */
-void checkDHT11() {
+float getHumidity() {
+  if (checkDHT11())
+    return (float)DHT11.humidity;
+  else
+    return -1000;
+}
+
+/**
+ * Contact the DHT11 and read the latest value
+ * When true is returned, the the values can be read from
+ * the DHT11 variable.
+ * @return true on success
+ */
+boolean checkDHT11() {
   int chk = DHT11.read(DHT11_Pin);
+
+#if DSERIAL
   if (chk != DHTLIB_OK) {
     switch (chk)
     {
@@ -21,12 +37,14 @@ void checkDHT11() {
                   Serial.println("Unknown error");
                   break;
     }
-    return;
+  } else {
+    Serial.print("Humidity (%): ");
+    Serial.println((float)DHT11.humidity, 2);
+  
+    Serial.print("Temperature (oC): ");
+    Serial.println((float)DHT11.temperature, 2);
   }
+#endif
+  return chk == DHTLIB_OK;
 
-  Serial.print("Humidity (%): ");
-  Serial.println((float)DHT11.humidity, 2);
-
-  Serial.print("Temperature (oC): ");
-  Serial.println((float)DHT11.temperature, 2);
 }

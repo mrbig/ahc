@@ -40,10 +40,7 @@ void setup(void) {
 void loop(void) {
 
   checkEthernet();
-  /*
-  checkOneWire();
-  checkDHT11();
-  */
+
 }
 
 

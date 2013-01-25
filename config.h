@@ -16,8 +16,8 @@ static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 int Ether_Pin = 10;
 
 // DS18S20 Signal pin on digital 2
-int DS18S20_Pin = 3;
+int DS18S20_Pin = 2;
  // Pin for the DHT11
-int DHT11_Pin = 4;
+int DHT11_Pin = 3;
  // Pin of the controlled device
-int Control_Pin = 5;
+int Control_Pin = 4;
