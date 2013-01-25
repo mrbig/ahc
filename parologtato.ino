@@ -5,7 +5,9 @@
 
 
 // Output state of the driver
-byte IOState;
+static byte IOState;
+
+
 
 // tcp/ip send and receive buffer
 byte Ethernet::buffer[500];
@@ -40,7 +42,42 @@ void setup(void) {
 void loop(void) {
 
   checkEthernet();
+  IOController();
 
+}
+
+/**
+ * Check the humidity at every five second, a decide wether the
+ * IO should be turned on or off
+ */
+void IOController() {
+  static unsigned long lastMillis = 0;
+  unsigned long currentMillis = millis();
+  float humidity;
+  
+  if (currentMillis - lastMillis < 5000) return;
+  
+  lastMillis = currentMillis;
+  
+#if DSERIAL
+  Serial.println("Checking IO state");
+#endif
+
+  humidity = getTemp(); // for debugging
+  
+  if (humidity <= -1000) {
+    // If there was an error then turn off the IO
+    IOState = 0;
+  }
+  else if (humidity <= MIN_HUM) {
+    IOState = 1;
+  }
+  else if (humidity >= MAX_HUM) {
+    IOState = 0;
+  }
+  
+  digitalWrite(Control_Pin, IOState);
+  
 }
 
 
