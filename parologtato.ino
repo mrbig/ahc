@@ -14,6 +14,11 @@ static byte IOState;
 static byte IOMode = IOMODE_OFF;
 
 
+// Target humidity minimum (below this we will turn on the IO)
+static byte targetHumidity_min = DEFAULT_HUMIDITY_MIN;
+
+// Target humidity maximum (turn off the IO above this)
+static byte targetHumidity_max = DEFAULT_HUMIDITY_MAX;
 
 
 // tcp/ip send and receive buffer
@@ -80,10 +85,10 @@ void IOController(boolean force) {
       // If there was an error then turn off the IO
       IOState = 0;
     }
-    else if (humidity <= MIN_HUM) {
+    else if (humidity < targetHumidity_min) {
       IOState = 1;
     }
-    else if (humidity >= MAX_HUM) {
+    else if (humidity >= targetHumidity_max) {
       IOState = 0;
     }
   } else {
@@ -94,8 +99,6 @@ void IOController(boolean force) {
   digitalWrite(Control_Pin, IOState);
   
 }
-
-
 
 
 

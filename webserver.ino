@@ -45,6 +45,8 @@ static void serviceHttpRequest(BufferFiller& buf, const word pos) {
     homePage(buf);
   else if (strncmp("GET /?io=", data, 8) == 0)
     updateIO(buf, data);
+  else if (strncmp("GET /?min=", data, 9) == 0)
+    updateTarget(buf, data);
   else
     send404(buf);
 
@@ -101,7 +103,13 @@ static void homePage(BufferFiller& buf) {
     IOMode == IOMODE_OFF
   );
   buf.emit_p(PSTR(
-    "</form>$F"), htmlFooter);
+    "</form>"));
+  buf.emit_p(PSTR("<form>"
+    "<h2>elvárt páratartalom:</h2>"
+    "<p><label>min: <input name=\"min\" size=\"2\" maxlength=\"2\" value=\"$D\">%</label> "
+    "<label>max: <input name=\"max\" size=\"2\" maxlength=\"2\" value=\"$D\">%</label></p>"
+    "<input type=\"submit\" value=\"ok\">"
+    "</form>$F"), targetHumidity_min, targetHumidity_max, htmlFooter);
 }
 
 static int getIntArg(const char* data, const char* key, int value =-1) {
@@ -109,6 +117,43 @@ static int getIntArg(const char* data, const char* key, int value =-1) {
   if (ether.findKeyVal(data + 6, temp, sizeof temp, key) > 0)
       value = atoi(temp);
   return value;
+}
+
+/**
+ * Update the target humidity value
+ *
+ * @param BufferFiller buf the buffer used to write to the output
+ * @param const char* data the incoming tcp data
+ */
+static void updateTarget(BufferFiller& buf, const char* data) {
+  byte min = getIntArg(data, "min");
+  byte max = getIntArg(data, "max");
+#if DSERIAL
+  Serial.print("Received new target value, min: ");
+  Serial.print(min, DEC);
+  Serial.print(" max: ");
+  Serial.println(max, DEC);
+#endif
+  if (checkTargetHumidity(min, max)) {
+    targetHumidity_min = min;
+    targetHumidity_max = max;
+    IOController(true);
+    // TODO: write to the eeprom
+  }
+  buf.emit_p(redirect);
+}
+
+/**
+ * Check the target humidity values for correctness
+ * @param byte min the minimum value
+ * @param byte max the maximum value
+ * @return boolean true if the values are correct
+ */
+static boolean checkTargetHumidity(const byte min, const byte max) {
+  if (min<20) return false;
+  if (max>90) return false;
+  if (min>max) return false;
+  return true;
 }
 
 /**

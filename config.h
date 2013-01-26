@@ -1,8 +1,8 @@
 #define DSERIAL 1 // set to 1 to show incoming request on serial port
 
 // This is the targe humidity intervall
-#define MIN_HUM 28
-#define MAX_HUM 30
+#define DEFAULT_HUMIDITY_MIN 28
+#define DEFAULT_HUMIDITY_MAX 30
 
 /**
  * ethernet configuration
