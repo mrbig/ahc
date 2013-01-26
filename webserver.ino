@@ -106,8 +106,8 @@ static void homePage(BufferFiller& buf) {
     "</form>"));
   buf.emit_p(PSTR("<form>"
     "<h2>elvárt páratartalom:</h2>"
-    "<p><label>min: <input name=\"min\" size=\"2\" maxlength=\"2\" value=\"$D\">%</label> "
-    "<label>max: <input name=\"max\" size=\"2\" maxlength=\"2\" value=\"$D\">%</label></p>"
+    "<p><label>min: <input name=\"min\" size=\"2\" maxlength=\"2\" type=\"number\" min=\"20\" max=\"90\" pattern=\"[0-9]{2}\" value=\"$D\">%</label> "
+    "<label>max: <input name=\"max\" size=\"2\" maxlength=\"2\" type=\"number\" min=\"20\" max=\"90\" pattern=\"[0-9]{2}\" value=\"$D\">%</label></p>"
     "<input type=\"submit\" value=\"ok\">"
     "</form>$F"), targetHumidity_min, targetHumidity_max, htmlFooter);
 }

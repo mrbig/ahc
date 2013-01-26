@@ -22,7 +22,7 @@ static byte targetHumidity_max = DEFAULT_HUMIDITY_MAX;
 
 
 // tcp/ip send and receive buffer
-byte Ethernet::buffer[768];
+byte Ethernet::buffer[880];
 
 
 /**
