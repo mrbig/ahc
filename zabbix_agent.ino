@@ -17,6 +17,7 @@ static const char cmd2[] PROGMEM = "agent.version";
 static const char cmd3[] PROGMEM = "ahc.iostate";
 static const char cmd4[] PROGMEM = "ahc.temperature";
 static const char cmd5[] PROGMEM = "ahc.humidity";
+static const char cmd6[] PROGMEM = "ahc.memory.free";
 
 /**
  * Configuration of the commands and the callbacks
@@ -27,6 +28,7 @@ static const ZabbixConfig zabbix_config[] = {
   {cmd3, &zbx_ahc_iostate},
   {cmd4, &zbx_ahc_temperature},
   {cmd5, &zbx_ahc_humidity},
+  {cmd6, &zbx_ahc_memory},
 };
 
 /**
@@ -75,11 +77,21 @@ static void zbx_ahc_humidity(BufferFiller &buf, String &cmd) {
 }
 
 /**
+ * Return the available memory
+ */
+static void zbx_ahc_memory(BufferFiller &buf, String &cmd) {
+  char buffer[16];
+  sprintf(buffer, "%d", memoryTest());
+  sendZabbixResponse(buf, buffer);
+}
+
+/**
  * Handle version check
  */
 static void zbx_agent_version(BufferFiller &buf, String &cmd) {
   sendZabbixResponse(buf, "ahc 0.1");
 }
+
 
 /**
  * Handle incoming requests for the zabbix agent
