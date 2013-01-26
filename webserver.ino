@@ -76,22 +76,29 @@ static void printRadio(BufferFiller& buf, const char* label, const char* name, c
 static void homePage(BufferFiller& buf) {
   buf.emit_p(PSTR("$F\r\n"
     "$F"
-    "<h1>Lámpa távirányítás</h1>"
+    "<h1>Párologtató vezérlés</h1>"
     "<form>"
   ), okHeader, htmlHeader);
+  printRadio(
+    buf,
+    PSTR("Auto:"),
+    PSTR("io"),
+    PSTR("2"),
+    IOMode == IOMODE_AUTO
+  );
   printRadio(
     buf,
     PSTR("Be:"),
     PSTR("io"),
     PSTR("1"),
-    IOState
+    IOMode == IOMODE_ON
   );
   printRadio(
     buf,
     PSTR("Ki:"),
     PSTR("io"),
     PSTR("0"),
-    !IOState
+    IOMode == IOMODE_OFF
   );
   buf.emit_p(PSTR(
     "</form>$F"), htmlFooter);
@@ -116,9 +123,9 @@ static void updateIO(BufferFiller& buf, const char* data) {
   Serial.print("Received new io state");
   Serial.println(d, DEC);
 #endif
-  if (d>=0 && d<=1) {
-    IOState = d;
-    digitalWrite(Control_Pin, IOState);
+  if (d>=0 && d<=2) {
+    IOMode = d;
+    IOController(true);
   }
   buf.emit_p(redirect);
 }

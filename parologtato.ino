@@ -7,10 +7,17 @@
 // Output state of the driver
 static byte IOState;
 
+// This stores the current working mode of the io
+#define IOMODE_AUTO 2
+#define IOMODE_ON 1
+#define IOMODE_OFF 0
+static byte IOMode = IOMODE_OFF;
+
+
 
 
 // tcp/ip send and receive buffer
-byte Ethernet::buffer[500];
+byte Ethernet::buffer[768];
 
 
 /**
@@ -42,20 +49,21 @@ void setup(void) {
 void loop(void) {
 
   checkEthernet();
-  IOController();
+  IOController(false);
 
 }
 
 /**
  * Check the humidity at every five second, a decide wether the
  * IO should be turned on or off
+ * @param boolean force if set to true, then skips the time check
  */
-void IOController() {
+void IOController(boolean force) {
   static unsigned long lastMillis = 0;
   unsigned long currentMillis = millis();
   float humidity;
   
-  if (currentMillis - lastMillis < 5000) return;
+  if (!force && (currentMillis - lastMillis < 5000)) return;
   
   lastMillis = currentMillis;
   
@@ -65,15 +73,22 @@ void IOController() {
 
   humidity = getTemp(); // for debugging
   
-  if (humidity <= -1000) {
-    // If there was an error then turn off the IO
-    IOState = 0;
-  }
-  else if (humidity <= MIN_HUM) {
-    IOState = 1;
-  }
-  else if (humidity >= MAX_HUM) {
-    IOState = 0;
+  // In auto mode update the state depending 
+  // on the current humidity value
+  if (IOMode == IOMODE_AUTO) {
+    if (humidity <= -1000) {
+      // If there was an error then turn off the IO
+      IOState = 0;
+    }
+    else if (humidity <= MIN_HUM) {
+      IOState = 1;
+    }
+    else if (humidity >= MAX_HUM) {
+      IOState = 0;
+    }
+  } else {
+    // In manual mode set to the current value
+    IOState = IOMode;
   }
   
   digitalWrite(Control_Pin, IOState);
