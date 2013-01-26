@@ -12,6 +12,8 @@ static byte myip[] = { 192,168,1,200 };
 // ethernet mac address - must be unique on your network
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 
+// This id is used to identify our data in the eeprom
+#define EEPROM_ID 0x42
 
 /**
  * Pinout configuration

@@ -137,8 +137,11 @@ static void updateTarget(BufferFiller& buf, const char* data) {
   if (checkTargetHumidity(min, max)) {
     targetHumidity_min = min;
     targetHumidity_max = max;
+  
     IOController(true);
-    // TODO: write to the eeprom
+    
+    saveSettings();
+
   }
   buf.emit_p(redirect);
 }

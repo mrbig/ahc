@@ -1,5 +1,5 @@
 #include <EtherCard.h>
-
+#include <EEPROM.h>
 #include "config.h"
 
 
@@ -44,6 +44,7 @@ void setup(void) {
   }
   
   ether.staticSetup(myip);
+  loadSettings();
 
 #if DSERIAL
   ether.printIp(F("IP:  "), ether.myip);
@@ -106,6 +107,52 @@ void IOController(boolean force) {
   
 }
 
+/**
+ * Writes current settings to the EEPROM
+ */
+void saveSettings() {
+  int ptr = 0;
+  byte checksum = 0;
+  EEPROM.write(ptr++, EEPROM_ID);
+  EEPROM.write(ptr++, IOMode);
+  EEPROM.write(ptr++, targetHumidity_min);
+  EEPROM.write(ptr++, targetHumidity_max);
+  checksum = IOMode + targetHumidity_min + targetHumidity_max;
+  EEPROM.write(ptr++, checksum);
+}
+
+/**
+ * Loads the current settings from the EEPROM
+ */
+void loadSettings() {
+  int ptr = 0;
+  byte checksum = 0;
+  byte i;
+  
+  if (EEPROM.read(ptr++) != EEPROM_ID) {
+#if DSERIAL
+    Serial.println(F("Invalid EEPROM_ID found"));
+#endif
+    return;
+  }
+  
+  // calculate the cheksum
+  for (i=ptr; i<ptr+3; i++) {
+    checksum += EEPROM.read(i);
+  }
+  
+  if (checksum != EEPROM.read(i)) {
+#if DSERIAL
+    Serial.println(F("Checksum error, when reading from eeprom"));
+#endif
+    return;
+  }
+
+  IOMode = EEPROM.read(ptr++);
+  targetHumidity_min = EEPROM.read(ptr++);
+  targetHumidity_max = EEPROM.read(ptr++);
+  
+}
 
 // this function will return the number of bytes currently free in RAM - for diagnostics only
 int memoryTest()
