@@ -129,9 +129,9 @@ static void updateTarget(BufferFiller& buf, const char* data) {
   byte min = getIntArg(data, "min");
   byte max = getIntArg(data, "max");
 #if DSERIAL
-  Serial.print("Received new target value, min: ");
+  Serial.print(F("Received new target value, min: "));
   Serial.print(min, DEC);
-  Serial.print(" max: ");
+  Serial.print(F(" max: "));
   Serial.println(max, DEC);
 #endif
   if (checkTargetHumidity(min, max)) {
@@ -165,7 +165,7 @@ static boolean checkTargetHumidity(const byte min, const byte max) {
 static void updateIO(BufferFiller& buf, const char* data) {
   byte d = getIntArg(data, "io");
 #if DSERIAL
-  Serial.print("Received new io state");
+  Serial.print(F("Received new io state"));
   Serial.println(d, DEC);
 #endif
   if (d>=0 && d<=2) {

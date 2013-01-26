@@ -22,15 +22,15 @@ float getTemp(){
 
   if ( OneWire::crc8( addr, 7) != addr[7]) {
 #if DSERIAL
-    Serial.println("CRC is not valid!");
+    Serial.println(F("CRC is not valid!"));
 #endif
     return -1000;
   }
   
 #if DSERIAL
-  Serial.print("Found device: ");
+  Serial.print(F("Found device: "));
   for (byte i=0; i<8; i++) {
-    if (addr[i]<16) Serial.print("0");
+    if (addr[i]<16) Serial.print(F("0"));
     Serial.print(addr[i], HEX);
   }
   Serial.println("");
@@ -38,7 +38,7 @@ float getTemp(){
 
   if ( addr[0] != 0x10 && addr[0] != 0x28) {
 #if DSERIAL
-    Serial.print("Device is not recognized");
+    Serial.print(F("Device is not recognized"));
 #endif
     return -1000;
   }

@@ -56,7 +56,7 @@ static void zbx_ahc_temperature(BufferFiller &buf, String &cmd) {
     dtostrf(temp, 4, 2, buffer);
     sendZabbixResponse(buf, buffer);
   } else {
-    sendZabbixResponse(buf, "ZBX_ERROR");
+    sendZabbixError(buf);
   }
 }
 
@@ -70,7 +70,7 @@ static void zbx_ahc_humidity(BufferFiller &buf, String &cmd) {
     dtostrf(hum, 4, 2, buffer);
     sendZabbixResponse(buf, buffer);
   } else {
-    sendZabbixResponse(buf, "ZBX_ERROR");
+    sendZabbixError(buf);
   }
 }
 
@@ -97,7 +97,7 @@ static void serviceZabbixRequest(BufferFiller &buf, word pos) {
   char c;
 
 #if DSERIAL
-  Serial.println("got packet on 10050");
+  Serial.println(F("got packet on 10050"));
   Serial.println(cmd);
 #endif
 
@@ -148,9 +148,9 @@ void sendZabbixResponse(BufferFiller &buf, const char* response) {
     }
   }
 #if DSERIAL
-  Serial.print("response: (");
+  Serial.print(F("response: ("));
   Serial.print(len);
-  Serial.print(")");
+  Serial.print(F(")"));
   Serial.println(response);
 #endif
   
@@ -159,4 +159,13 @@ void sendZabbixResponse(BufferFiller &buf, const char* response) {
   buf.emit_raw(header, 9);
   buf.emit_raw(response, len);
   ether.httpServerReply(buf.position());
+}
+
+/**
+ * Send an ZBX_ERROR to the zabbix client
+ *
+ * @param BufferFiller buf the buffer filler to be used for output
+ */
+static void sendZabbixError(BufferFiller &buf) {
+  sendZabbixResponse(buf, "ZBX_ERROR");
 }

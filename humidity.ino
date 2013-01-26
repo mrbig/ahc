@@ -28,20 +28,20 @@ boolean checkDHT11() {
     switch (chk)
     {
       case DHTLIB_ERROR_CHECKSUM:
-                  Serial.println("Checksum error");
+                  Serial.println(F("Checksum error"));
                   break;
       case DHTLIB_ERROR_TIMEOUT:
-                  Serial.println("Time out error");
+                  Serial.println(F("Time out error"));
                   break;
       default:
-                  Serial.println("Unknown error");
+                  Serial.println(F("Unknown error"));
                   break;
     }
   } else {
-    Serial.print("Humidity (%): ");
+    Serial.print(F("Humidity (%): "));
     Serial.println((float)DHT11.humidity, 2);
   
-    Serial.print("Temperature (oC): ");
+    Serial.print(F("Temperature (oC): "));
     Serial.println((float)DHT11.temperature, 2);
   }
 #endif

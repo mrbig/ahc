@@ -31,20 +31,24 @@ byte Ethernet::buffer[768];
 void setup(void) {
 #if DSERIAL
   Serial.begin(57600);
-  Serial.println("booting...");
+  Serial.println(F("booting..."));
 #endif
   pinMode(Control_Pin, OUTPUT);
   
   // Setup the ethernet card
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 10) == 0) 
-    Serial.println( "Failed to access Ethernet controller");
+  if (ether.begin(sizeof Ethernet::buffer, mymac, 10) == 0) {
+#if !DSERIAL
+    Serial.begin(57600);
+#endif
+    Serial.println(F("Failed to access Ethernet controller"));
+  }
   
   ether.staticSetup(myip);
 
 #if DSERIAL
-  ether.printIp("IP:  ", ether.myip);
-  ether.printIp("GW:  ", ether.gwip);  
-  ether.printIp("DNS: ", ether.dnsip);  
+  ether.printIp(F("IP:  "), ether.myip);
+  ether.printIp(F("GW:  "), ether.gwip);  
+  ether.printIp(F("DNS: "), ether.dnsip);  
 #endif
 }
 
@@ -73,7 +77,7 @@ void IOController(boolean force) {
   lastMillis = currentMillis;
   
 #if DSERIAL
-  Serial.println("Checking IO state");
+  Serial.println(F("Checking IO state"));
 #endif
 
   humidity = getTemp(); // for debugging
