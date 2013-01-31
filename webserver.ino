@@ -174,6 +174,7 @@ static void updateIO(BufferFiller& buf, const char* data) {
   if (d>=0 && d<=2) {
     IOMode = d;
     IOController(true);
+    saveSettings();
   }
   buf.emit_p(redirect);
 }
