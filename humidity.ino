@@ -1,27 +1,27 @@
-#include <dht11.h>
+#include <dht.h>
 
 //dht11 i/o library
-dht11 DHT11;
+dht DHT;
 
 /**
  * Return the current humidity
  * @return the humidity or -1000 if there was an error
  */
 float getHumidity() {
-  if (checkDHT11())
-    return (float)DHT11.humidity;
+  if (checkDHT())
+    return (float)DHT.humidity;
   else
     return -1000;
 }
 
 /**
- * Contact the DHT11 and read the latest value
+ * Contact the DHT and read the latest value
  * When true is returned, the the values can be read from
  * the DHT11 variable.
  * @return true on success
  */
-boolean checkDHT11() {
-  int chk = DHT11.read(DHT11_Pin);
+boolean checkDHT() {
+  int chk = DHT.read22(DHT_Pin);
 
 #if DSERIAL
   if (chk != DHTLIB_OK) {
@@ -39,10 +39,10 @@ boolean checkDHT11() {
     }
   } else {
     Serial.print(F("Humidity (%): "));
-    Serial.println((float)DHT11.humidity, 2);
+    Serial.println((float)DHT.humidity, 2);
   
     Serial.print(F("Temperature (oC): "));
-    Serial.println((float)DHT11.temperature, 2);
+    Serial.println((float)DHT.temperature, 2);
   }
 #endif
   return chk == DHTLIB_OK;

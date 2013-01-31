@@ -23,7 +23,7 @@ int Ether_Pin = 10;
 
 // DS18S20 Signal pin on digital 2
 int DS18S20_Pin = 2;
- // Pin for the DHT11
-int DHT11_Pin = 3;
+ // Pin for the DHT21
+int DHT_Pin = 3;
  // Pin of the controlled device
 int Control_Pin = 4;
