@@ -1,4 +1,4 @@
-#define DSERIAL 1 // set to 1 to show incoming request on serial port
+#define DSERIAL 0 // set to 1 to show incoming request on serial port
 
 // This is the targe humidity intervall
 #define DEFAULT_HUMIDITY_MIN 28
@@ -26,4 +26,4 @@ int DS18S20_Pin = 2;
  // Pin for the DHT21
 int DHT_Pin = 3;
  // Pin of the controlled device
-int Control_Pin = 4;
+int Control_Pin = 7;
