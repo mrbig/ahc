@@ -1,17 +1,27 @@
 #include <dht.h>
 
-//dht11 i/o library
+//dht2x i/o library
 dht DHT;
+
+// last status of the dht check
+static int dhtStatus = -1;
 
 /**
  * Return the current humidity
  * @return the humidity or -1000 if there was an error
  */
 float getHumidity() {
-  if (checkDHT())
+  if (dhtStatus == DHTLIB_OK)
     return (float)DHT.humidity;
   else
     return -1000;
+}
+
+/**
+ * Return the state of the last humidity download
+ */
+int getHumidityStatus() {
+  return dhtStatus;
 }
 
 /**
@@ -21,11 +31,11 @@ float getHumidity() {
  * @return true on success
  */
 boolean checkDHT() {
-  int chk = DHT.read22(DHT_Pin);
+  dhtStatus = DHT.read22(DHT_Pin);
 
 #if DSERIAL
-  if (chk != DHTLIB_OK) {
-    switch (chk)
+  if (dhtStatus != DHTLIB_OK) {
+    switch (dhtStatus)
     {
       case DHTLIB_ERROR_CHECKSUM:
                   Serial.println(F("Checksum error"));
@@ -45,6 +55,6 @@ boolean checkDHT() {
     Serial.println((float)DHT.temperature, 2);
   }
 #endif
-  return chk == DHTLIB_OK;
+  return dhtStatus == DHTLIB_OK;
 
 }

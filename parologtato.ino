@@ -83,6 +83,7 @@ void IOController(boolean force) {
   Serial.println(F("Checking IO state"));
 #endif
 
+  checkDHT();
   humidity = getHumidity();
   
   // In auto mode update the state depending 

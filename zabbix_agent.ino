@@ -18,6 +18,7 @@ static const char cmd3[] PROGMEM = "ahc.iostate";
 static const char cmd4[] PROGMEM = "ahc.temperature";
 static const char cmd5[] PROGMEM = "ahc.humidity";
 static const char cmd6[] PROGMEM = "ahc.memory.free";
+static const char cmd7[] PROGMEM = "ahc.dht.status";
 
 /**
  * Configuration of the commands and the callbacks
@@ -29,6 +30,7 @@ static const ZabbixConfig zabbix_config[] = {
   {cmd4, &zbx_ahc_temperature},
   {cmd5, &zbx_ahc_humidity},
   {cmd6, &zbx_ahc_memory},
+  {cmd7, &zbx_ahc_dhtStatus}
 };
 
 /**
@@ -75,6 +77,16 @@ void zbx_ahc_humidity(BufferFiller &buf, String &cmd) {
     sendZabbixError(buf);
   }
 }
+
+/**
+ * Return the last humidity download status
+ */
+void zbx_ahc_dhtStatus(BufferFiller &buf, String &cmd) {
+  char buffer[6];
+  sprintf(buffer, "%d", abs(getHumidityStatus()));
+  sendZabbixResponse(buf, buffer);
+}
+
 
 /**
  * Return the available memory
