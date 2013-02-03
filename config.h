@@ -4,6 +4,9 @@
 #define DEFAULT_HUMIDITY_MIN 28
 #define DEFAULT_HUMIDITY_MAX 30
 
+// How often the humidity is checked (in milliseconds)
+#define CHECK_INTERVAL 5000
+
 /**
  * ethernet configuration
  */

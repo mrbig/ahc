@@ -75,7 +75,7 @@ void IOController(boolean force) {
   unsigned long currentMillis = millis();
   float humidity;
   
-  if (!force && (currentMillis - lastMillis < 5000)) return;
+  if (!force && (currentMillis - lastMillis < CHECK_INTERVAL)) return;
   
   lastMillis = currentMillis;
   
