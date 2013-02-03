@@ -7,6 +7,9 @@
 // How often the humidity is checked (in milliseconds)
 #define CHECK_INTERVAL 5000
 
+// Count of checks to calculate the average humidity
+#define CHECK_COUNT 10
+
 /**
  * ethernet configuration
  */

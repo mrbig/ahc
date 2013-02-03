@@ -45,6 +45,8 @@ void setup(void) {
   
   ether.staticSetup(myip);
   loadSettings();
+  
+  initHumidity();
 
 #if DSERIAL
   ether.printIp(F("IP:  "), ether.myip);

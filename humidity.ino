@@ -3,18 +3,55 @@
 //dht2x i/o library
 dht DHT;
 
+static float aHumidity[CHECK_COUNT];
+static byte avgPos = 0;
+
 // last status of the dht check
 static int dhtStatus = -1;
 
 /**
- * Return the current humidity
+ * Initialize the humidity component
+ * We set every item in the average array to -1000
+ */
+void initHumidity() {
+  for (byte i =0; i<CHECK_COUNT; i++) {
+    aHumidity[i] = -1000;
+  }
+}
+
+/**
+ * Return the current humidity. We calculate the average
+ * of the last CHECK_COUNT readings
  * @return the humidity or -1000 if there was an error
  */
 float getHumidity() {
-  if (dhtStatus == DHTLIB_OK)
-    return (float)DHT.humidity;
-  else
+  float sum = 0;
+  byte count, i;
+  count = 0;
+#if DSERIAL
+  Serial.println(F("Calculating average:"));
+#endif
+  for (i=0; i<CHECK_COUNT; i++) {
+#if DSERIAL
+    Serial.println(aHumidity[i], 2);
+#endif
+    if (aHumidity[i] != -1000) {
+      sum += aHumidity[i];
+      count++;
+    }
+  }
+  if (count > 0) {
+#if DSERIAL
+    Serial.print(F("Average: "));
+    Serial.println(sum/count, 2);
+#endif
+    return sum/count;
+  } else {
+#if DSERIAL
+    Serial.print(F("Average: -1000"));
+#endif
     return -1000;
+  }
 }
 
 /**
@@ -23,6 +60,7 @@ float getHumidity() {
 int getHumidityStatus() {
   return dhtStatus;
 }
+
 
 /**
  * Contact the DHT and read the latest value
@@ -55,6 +93,14 @@ boolean checkDHT() {
     Serial.println((float)DHT.temperature, 2);
   }
 #endif
+  if (dhtStatus == DHTLIB_OK) {
+    aHumidity[avgPos] = (float)DHT.humidity;
+  } else {
+    aHumidity[avgPos] = -1000;
+  }
+  avgPos++;
+  avgPos = avgPos % CHECK_COUNT;
+
   return dhtStatus == DHTLIB_OK;
 
 }
