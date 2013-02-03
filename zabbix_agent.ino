@@ -34,14 +34,14 @@ static const ZabbixConfig zabbix_config[] = {
 /**
  * Handle the ping request
  */
-static void zbx_agent_ping(BufferFiller &buf, String &cmd) {
+void zbx_agent_ping(BufferFiller &buf, String &cmd) {
   sendZabbixResponse(buf, "1");
 }
 
 /**
  * Return the current io state
  */
-static void zbx_ahc_iostate(BufferFiller &buf, String &cmd) {
+void zbx_ahc_iostate(BufferFiller &buf, String &cmd) {
   char buffer[2];
   buffer[0] = IOState + '0';
   buffer[1] = 0;
@@ -51,7 +51,7 @@ static void zbx_ahc_iostate(BufferFiller &buf, String &cmd) {
 /**
  * Return the current temperature
  */
-static void zbx_ahc_temperature(BufferFiller &buf, String &cmd) {
+void zbx_ahc_temperature(BufferFiller &buf, String &cmd) {
   char buffer[16];
   float temp = getTemp();
   if (temp > -1000) {
@@ -65,7 +65,7 @@ static void zbx_ahc_temperature(BufferFiller &buf, String &cmd) {
 /**
  * Return the current humidity
  */
-static void zbx_ahc_humidity(BufferFiller &buf, String &cmd) {
+void zbx_ahc_humidity(BufferFiller &buf, String &cmd) {
   char buffer[16];
   float hum = getHumidity();
   if (hum > -1000) {
@@ -79,7 +79,7 @@ static void zbx_ahc_humidity(BufferFiller &buf, String &cmd) {
 /**
  * Return the available memory
  */
-static void zbx_ahc_memory(BufferFiller &buf, String &cmd) {
+void zbx_ahc_memory(BufferFiller &buf, String &cmd) {
   char buffer[16];
   sprintf(buffer, "%d", memoryTest());
   sendZabbixResponse(buf, buffer);
@@ -88,7 +88,7 @@ static void zbx_ahc_memory(BufferFiller &buf, String &cmd) {
 /**
  * Handle version check
  */
-static void zbx_agent_version(BufferFiller &buf, String &cmd) {
+void zbx_agent_version(BufferFiller &buf, String &cmd) {
   sendZabbixResponse(buf, "ahc 0.1");
 }
 
@@ -100,7 +100,7 @@ static void zbx_agent_version(BufferFiller &buf, String &cmd) {
  * @param BufferFiller buf the buffer filler to be used for output
  * @param word pos position in the tcp packet
  */
-static void serviceZabbixRequest(BufferFiller &buf, word pos) {
+void serviceZabbixRequest(BufferFiller &buf, word pos) {
 
   byte i;
   String cmd = String((char *) Ethernet::buffer + pos);
@@ -178,6 +178,6 @@ void sendZabbixResponse(BufferFiller &buf, const char* response) {
  *
  * @param BufferFiller buf the buffer filler to be used for output
  */
-static void sendZabbixError(BufferFiller &buf) {
+void sendZabbixError(BufferFiller &buf) {
   sendZabbixResponse(buf, "ZBX_ERROR");
 }

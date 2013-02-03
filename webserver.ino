@@ -32,7 +32,7 @@ static const char htmlFooter[] PROGMEM =
  * @param BufferFiller buf the buffer filler to be used for output
  * @param word pos Position in the ethernet packet
  */
-static void serviceHttpRequest(BufferFiller& buf, const word pos) {
+void serviceHttpRequest(BufferFiller& buf, const word pos) {
   buf = ether.tcpOffset();
   char * data = (char *) Ethernet::buffer + pos;
 
@@ -62,7 +62,7 @@ static void serviceHttpRequest(BufferFiller& buf, const word pos) {
  * @param const char * value value of the radio button
  * @param byte state wether the radio button should be marked on or off
  */
-static void printRadio(BufferFiller& buf, const char* label, const char* name, const char * value, const byte state) {
+void printRadio(BufferFiller& buf, const char* label, const char* name, const char * value, const byte state) {
   buf.emit_p(PSTR(
     "<label>$F<input type=\"radio\" name=\"$F\" value=\"$F\""
     ), label, name, value);
@@ -75,7 +75,7 @@ static void printRadio(BufferFiller& buf, const char* label, const char* name, c
  * Display the main page
  * @param BufferFiller buf the buffer used to write to the output
  */
-static void homePage(BufferFiller& buf) {
+void homePage(BufferFiller& buf) {
   buf.emit_p(PSTR("$F\r\n"
     "$F"
     "<h1>Párologtató vezérlés</h1>"
@@ -112,7 +112,7 @@ static void homePage(BufferFiller& buf) {
     "</form>$F"), targetHumidity_min, targetHumidity_max, htmlFooter);
 }
 
-static int getIntArg(const char* data, const char* key, int value =-1) {
+int getIntArg(const char* data, const char* key, int value =-1) {
   char temp[10];
   if (ether.findKeyVal(data + 6, temp, sizeof temp, key) > 0)
       value = atoi(temp);
@@ -125,7 +125,7 @@ static int getIntArg(const char* data, const char* key, int value =-1) {
  * @param BufferFiller buf the buffer used to write to the output
  * @param const char* data the incoming tcp data
  */
-static void updateTarget(BufferFiller& buf, const char* data) {
+void updateTarget(BufferFiller& buf, const char* data) {
   byte min = getIntArg(data, "min");
   byte max = getIntArg(data, "max");
 #if DSERIAL
@@ -152,7 +152,7 @@ static void updateTarget(BufferFiller& buf, const char* data) {
  * @param byte max the maximum value
  * @return boolean true if the values are correct
  */
-static boolean checkTargetHumidity(const byte min, const byte max) {
+boolean checkTargetHumidity(const byte min, const byte max) {
   if (min<20) return false;
   if (max>90) return false;
   if (min>max) return false;
@@ -165,7 +165,7 @@ static boolean checkTargetHumidity(const byte min, const byte max) {
  * @param BufferFiller buf the buffer used to write to the output
  * @param const char* data the incoming tcp data
  */
-static void updateIO(BufferFiller& buf, const char* data) {
+void updateIO(BufferFiller& buf, const char* data) {
   byte d = getIntArg(data, "io");
 #if DSERIAL
   Serial.print(F("Received new io state"));
@@ -183,7 +183,7 @@ static void updateIO(BufferFiller& buf, const char* data) {
  * Send a 404 reply
  * @param BufferFiller buf the buffer used to write to the output
  */
-static void send404(BufferFiller& buf) {
+void send404(BufferFiller& buf) {
   buf.emit_p(PSTR(
     "HTTP/1.0 404 Not found\r\n"
     "Content-Type: text/html\r\n"
