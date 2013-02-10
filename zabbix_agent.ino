@@ -37,6 +37,8 @@ static const char cmd4[] PROGMEM = "ahc.temperature";
 static const char cmd5[] PROGMEM = "ahc.humidity";
 static const char cmd6[] PROGMEM = "ahc.memory.free";
 static const char cmd7[] PROGMEM = "ahc.dht.status";
+static const char cmd8[] PROGMEM = "ahc.trg.min";
+static const char cmd9[] PROGMEM = "ahc.trg.max";
 
 /**
  * Configuration of the commands and the callbacks
@@ -48,7 +50,9 @@ static const ZabbixConfig zabbix_config[] = {
   {cmd4, &zbx_ahc_temperature},
   {cmd5, &zbx_ahc_humidity},
   {cmd6, &zbx_ahc_memory},
-  {cmd7, &zbx_ahc_dhtStatus}
+  {cmd7, &zbx_ahc_dhtStatus},
+  {cmd8, &zbx_ahc_targetHumidityMin},
+  {cmd9, &zbx_ahc_targetHumidityMax}
 };
 
 /**
@@ -110,8 +114,26 @@ void zbx_ahc_dhtStatus(BufferFiller &buf, String &cmd) {
  * Return the available memory
  */
 void zbx_ahc_memory(BufferFiller &buf, String &cmd) {
-  char buffer[16];
+  char buffer[6];
   sprintf(buffer, "%d", memoryTest());
+  sendZabbixResponse(buf, buffer);
+}
+
+/**
+ * Return the minimum target humidity
+ */
+void zbx_ahc_targetHumidityMin(BufferFiller &buf, String &cmd) {
+  char buffer[5];
+  sprintf(buffer, "%d", targetHumidity_min);
+  sendZabbixResponse(buf, buffer);
+}
+
+/**
+ * Return the maximum target humidity
+ */
+void zbx_ahc_targetHumidityMax(BufferFiller &buf, String &cmd) {
+  char buffer[5];
+  sprintf(buffer, "%d", targetHumidity_max);
   sendZabbixResponse(buf, buffer);
 }
 

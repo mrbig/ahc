@@ -43,11 +43,19 @@ static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
  * Pinout configuration
  */
 // Pin of the ethernet card
-int Ether_Pin = 10;
+byte Ether_Pin = 10;
 
 // DS18S20 Signal pin on digital 2
-int DS18S20_Pin = 2;
+byte DS18S20_Pin = 2;
  // Pin for the DHT21
-int DHT_Pin = 3;
+byte DHT_Pin = 3;
  // Pin of the controlled device
-int Control_Pin = 7;
+byte Control_Pin = 7;
+
+// Pin for the manual off switch
+byte Switch_Pin = 4;
+
+// How long to wait for the switch to debounce, before
+// accepting it's state.
+#define DEBOUNCE_DELAY 50
+

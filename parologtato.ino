@@ -41,6 +41,8 @@ static byte targetHumidity_min = DEFAULT_HUMIDITY_MIN;
 // Target humidity maximum (turn off the IO above this)
 static byte targetHumidity_max = DEFAULT_HUMIDITY_MAX;
 
+// If this is set to 1, then the io mode is always disabled.
+static byte manualOff = 0;
 
 // tcp/ip send and receive buffer
 byte Ethernet::buffer[880];
@@ -55,6 +57,7 @@ void setup(void) {
   Serial.println(F("booting..."));
 #endif
   pinMode(Control_Pin, OUTPUT);
+  pinMode(Switch_Pin, INPUT);
   
   // Setup the ethernet card
   if (ether.begin(sizeof Ethernet::buffer, mymac, 10) == 0) {
@@ -84,7 +87,8 @@ void setup(void) {
 void loop(void) {
 
   checkEthernet();
-  IOController(false);
+  
+  IOController(readManualOffSwitch());
 
 }
 
@@ -109,9 +113,14 @@ void IOController(boolean force) {
   checkDHT();
   humidity = getHumidity();
   
+  // If the manual off switch is turned on, then
+  // turn off the io
+  if (manualOff) {
+    IOState = 0;
+  }
   // In auto mode update the state depending 
   // on the current humidity value
-  if (IOMode == IOMODE_AUTO) {
+  else if (IOMode == IOMODE_AUTO) {
     if (humidity <= -1000) {
       // If there was an error then turn off the IO
       IOState = 0;
@@ -126,6 +135,11 @@ void IOController(boolean force) {
     // In manual mode set to the current value
     IOState = IOMode;
   }
+
+#if DSERIAL
+  Serial.print(F("Setting IO to: "));
+  Serial.println(IOState, DEC);
+#endif
   
   digitalWrite(Control_Pin, IOState);
   
@@ -176,6 +190,32 @@ void loadSettings() {
   targetHumidity_min = EEPROM.read(ptr++);
   targetHumidity_max = EEPROM.read(ptr++);
   
+}
+
+/**
+ * Read the state of the manual off switch, and set it in the
+ * manualOff global variable
+ * @return true, if the state has been changed.
+ */
+boolean readManualOffSwitch() {
+  static long lastDebounceTime = 0;
+  static byte lastSwitchState = 0;
+  
+  byte reading = digitalRead(Switch_Pin);
+  
+  if (reading != lastSwitchState) {
+    lastDebounceTime = millis();
+  }
+
+  // save the switch state for the next loop
+  lastSwitchState = reading;
+  
+  // Save the switch state, if it's been there for long enought
+  if (((millis() - lastDebounceTime) > DEBOUNCE_DELAY) && manualOff != reading) {
+    manualOff = reading;
+    return true;
+  }
+  return false;
 }
 
 // this function will return the number of bytes currently free in RAM - for diagnostics only

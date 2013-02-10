@@ -37,7 +37,7 @@ static const char htmlHeader[] PROGMEM =
   "<!DOCTYPE HTML>\n"
   "<html>"
   "<head>"
-    "<title>parologtato v0.1</title>"
+    "<title>parologtato v0.2</title>"
   "</head>"
   "<body>"
 ;
