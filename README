@@ -1,0 +1,79 @@
+
+  AHC - AHC Humidity Control
+==============================
+
+This is a demo project I build to monitor and control the humidity in my
+daughters room. The software runs on an arduino (uno) board, reads the
+humidity from a dht21, and turns on or off a humidifier connected to a relay
+module.
+
+
+  Features
+==============================
+
+ - can read humidity from a dht21, dht22 or dht21
+ - can read temperature from a ds18b20
+ - three operation modes: always off, always on, or automatic
+ - web interface to set the target humidity, and change operation mode
+ - zabbix agent, to monitor temperature, humidity and output state
+
+
+  Software requirements
+==============================
+
+This project uses the following libraries:
+
+ * EtherCard library
+   original: http://github.com/jcw/ethercard
+   note: I've altered the ethercard library, to be able to listen on
+         multiple prots. Unless it has been merged into the main line,
+         please use my version here:
+         http://github.com/mrbig/ethercard/tree/f/multi_port
+
+ * DHT library
+   http://arduino.cc/playground/Main/DHTLib
+
+ * OneWire library
+   http://playground.arduino.cc/Learning/OneWire
+   http://www.pjrc.com/teensy/td_libs_OneWire.html
+
+Download the above libraries, and place them under the sketchbook/libraries/
+folder. Then make shure you have restarted the arduino ide.
+
+I've build my project using avr-gcc 4.7.2. If you exeperience problems with
+older versions of avr-gcc, please try to upgrade first.
+
+  Hardware setup
+==============================
+
+This project uses the older Ethernet Shield v1.1. You can obtain it for
+several sites for relatively cheap, or the software could be easily modified
+to support the new wiznet ethernet shield. Ethernet related code is in the
+ethernet.ino file.
+
+The hardware uses currently three io pins:
+ - one for the dht
+ - one for the one wire communication
+ - one is set for output, and is set to high, when the humidifier should be
+ turned on.
+
+If any of the input is not working the code will ignore it.
+
+You can set the pins of the above inputs/outpus in the config.h file. This
+is where you can set the mac and ip address of the card also.
+
+  Zabbix agent
+==============================
+
+There's a self contained zabbix agent implemented in zabbix_agent.ino. The
+code makes it easy to add new handlers for the agent: you should place a new
+item in the zabbix_config array, where each item is a structure of
+ZabbixConfig. These contain the name of the item, and the callback method. 
+
+To respond call the sendZabbixResponse() method. To send an error (when the
+monitored item is temporarily not available) call the sendZabbixError
+method.
+
+The agent support the 1.4.x passive agent protocol. For unhandled items
+automatically the ZBX_NOTSUPPORTED answare is returned.
+

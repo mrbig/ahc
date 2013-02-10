@@ -1,3 +1,24 @@
+/* Copyright (C) 2009 Nagy Attila Gabor <nagy.attila.gabor@gmail.com>
+ *
+ *     This file is part of AHC - AHC Humidity Control.
+ *
+ *  TrackMii is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  TrackMii is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with AHC.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * This is the main file of the software. Contains the setup, the
+ *  loop, and the IO controller methods
+ */
 #include <EtherCard.h>
 #include <EEPROM.h>
 #include "config.h"
