@@ -78,7 +78,7 @@ void zbx_ahc_iostate(BufferFiller &buf, String &cmd) {
 void zbx_ahc_temperature(BufferFiller &buf, String &cmd) {
   char buffer[16];
   float temp = getTemp();
-  if (temp > -1000) {
+  if (temp > -1000 && temp != 0) {
     dtostrf(temp, 4, 2, buffer);
     sendZabbixResponse(buf, buffer);
   } else {
