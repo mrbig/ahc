@@ -24,6 +24,9 @@
 OneWire ds(DS18S20_Pin);
 
 
+// After bootup the first few readings can be very bad
+// so we make shure, they are thrown away
+unsigned long readingCount = 0;
 
 /**
  * Read the temperature from the first DS18S20 on the bus
@@ -83,6 +86,8 @@ float getTemp(){
 
   float tempRead = ((MSB << 8) | LSB); //using two's compliment
   float TemperatureSum = tempRead / 16;
+  
+  if (readingCount++ < 2) return -1000; // After bootup we throw away the first two readings
 
   return TemperatureSum;
 
